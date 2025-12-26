@@ -28,7 +28,7 @@ This repository contains runnable implementations of the tutorial in multiple la
 
 3. Configure your API key:
    ```bash
-   cp .env.example .env
+   mise run setup        # Creates .env from template
    # Edit .env and add your ANTHROPIC_API_KEY
    ```
 
@@ -44,6 +44,13 @@ List all available tasks:
 mise tasks
 ```
 
+### Setup Tasks
+
+| Task | Description |
+|------|-------------|
+| `mise run setup` | Create `.env` file from template (if it doesn't exist) |
+| `mise run check-env` | Verify `ANTHROPIC_API_KEY` is configured |
+
 ### Go Tasks
 
 | Task | Description |
@@ -55,6 +62,8 @@ mise tasks
 | `mise run go:step-03` | Agent with `read_file` tool |
 | `mise run go:step-04` | Agent with `read_file` + `list_files` tools |
 | `mise run go:step-05` | Complete agent with all tools |
+
+All `go:*` tasks automatically check that your API key is configured before running.
 
 ## Tutorial Steps
 
