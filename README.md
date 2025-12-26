@@ -4,7 +4,9 @@ Code extracted from [How to Build an Agent](https://ampcode.com/how-to-build-an-
 
 This repository contains runnable implementations of the tutorial in multiple languages:
 
-- [Go](./go/) - Complete
+- [Go](./go/)
+- [JavaScript (Bun)](./js/)
+- [Ruby](./ruby/)
 
 ## Prerequisites
 
@@ -32,9 +34,11 @@ This repository contains runnable implementations of the tutorial in multiple la
    # Edit .env and add your ANTHROPIC_API_KEY
    ```
 
-4. Run the complete agent:
+4. Run the complete agent (pick your language):
    ```bash
-   mise run go:run
+   mise run go:run      # Go
+   mise run js:run      # JavaScript (Bun)
+   mise run ruby:run    # Ruby
    ```
 
 ## Available Tasks
@@ -63,7 +67,31 @@ mise tasks
 | `mise run go:step-04` | Agent with `read_file` + `list_files` tools |
 | `mise run go:step-05` | Complete agent with all tools |
 
-All `go:*` tasks automatically check that your API key is configured before running.
+### JavaScript (Bun) Tasks
+
+| Task | Description |
+|------|-------------|
+| `mise run js:deps` | Install JavaScript dependencies |
+| `mise run js:run` | Run the complete agent |
+| `mise run js:step-01` | Single API call to Claude |
+| `mise run js:step-02` | Interactive chatbot |
+| `mise run js:step-03` | Agent with `read_file` tool |
+| `mise run js:step-04` | Agent with `read_file` + `list_files` tools |
+| `mise run js:step-05` | Complete agent with all tools |
+
+### Ruby Tasks
+
+| Task | Description |
+|------|-------------|
+| `mise run ruby:deps` | Install Ruby dependencies |
+| `mise run ruby:run` | Run the complete agent |
+| `mise run ruby:step-01` | Single API call to Claude |
+| `mise run ruby:step-02` | Interactive chatbot |
+| `mise run ruby:step-03` | Agent with `read_file` tool |
+| `mise run ruby:step-04` | Agent with `read_file` + `list_files` tools |
+| `mise run ruby:step-05` | Complete agent with all tools |
+
+All tasks automatically check that your API key is configured before running.
 
 ## Tutorial Steps
 
@@ -77,6 +105,4 @@ Each step builds upon the previous one:
 | 04 | Multiple tools - adding `list_files` |
 | 05 | Complete agent - adding `edit_file` |
 
-## Adding More Languages
-
-This project is structured to support multiple language implementations. Each language gets its own folder with the same step structure.
+Each step folder contains a README with Mermaid diagrams explaining the architecture and message flow.
