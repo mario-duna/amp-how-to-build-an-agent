@@ -1,0 +1,16 @@
+{
+  "name": "how-to-build-an-agent-js",
+  "version": "1.0.0",
+  "description": "JavaScript implementation of 'How to Build an Agent' tutorial",
+  "type": "module",
+  "scripts": {
+    "step-01": "bun run step-01-hello-claude/index.js",
+    "step-02": "bun run step-02-chatbot/index.js",
+    "step-03": "bun run step-03-read-file/index.js",
+    "step-04": "bun run step-04-list-files/index.js",
+    "step-05": "bun run step-05-edit-file/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  }
+}

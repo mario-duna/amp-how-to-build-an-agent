@@ -1,5 +1,6 @@
 [tools]
 go = "1.23"
+bun = "latest"
 
 [env]
 # Set ANTHROPIC_API_KEY in your environment or in .env file
@@ -89,4 +90,47 @@ raw = true
 description = "Run step-05: Complete agent with all tools"
 run = "cd go/step-05-edit-file && go run main.go"
 depends = ["check-env", "go:deps"]
+raw = true
+
+# =============================================================================
+# JavaScript (Bun) tasks
+# =============================================================================
+
+[tasks."js:deps"]
+description = "Install JavaScript dependencies"
+run = "cd js && bun install"
+
+[tasks."js:run"]
+description = "Run the complete JS agent (step-05)"
+run = "cd js/step-05-edit-file && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-01"]
+description = "Run step-01: Hello Claude (single API call)"
+run = "cd js/step-01-hello-claude && bun run index.js"
+depends = ["check-env", "js:deps"]
+
+[tasks."js:step-02"]
+description = "Run step-02: Interactive chatbot"
+run = "cd js/step-02-chatbot && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-03"]
+description = "Run step-03: Agent with read_file tool"
+run = "cd js/step-03-read-file && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-04"]
+description = "Run step-04: Agent with read_file + list_files tools"
+run = "cd js/step-04-list-files && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-05"]
+description = "Run step-05: Complete agent with all tools"
+run = "cd js/step-05-edit-file && bun run index.js"
+depends = ["check-env", "js:deps"]
 raw = true
