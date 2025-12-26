@@ -73,10 +73,13 @@ def walk_directory(dir)
 end
 
 def execute_tool(name, input)
-  case name
+  # Convert input to hash with string keys for consistent access
+  input_hash = input.is_a?(Hash) ? input.transform_keys(&:to_s) : input.to_h.transform_keys(&:to_s)
+
+  case name.to_s
   when "read_file"
     begin
-      content = File.read(input["path"])
+      content = File.read(input_hash["path"])
       { result: content, is_error: false }
     rescue StandardError => e
       { result: e.message, is_error: true }
@@ -84,7 +87,7 @@ def execute_tool(name, input)
   when "list_files"
     begin
       # Default to current directory if no path provided
-      dir = input["path"] || "."
+      dir = input_hash["path"] || "."
       files = walk_directory(dir)
       # Return as JSON array - structured data is easier for Claude to work with
       { result: files.to_json, is_error: false }

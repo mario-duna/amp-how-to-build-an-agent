@@ -159,17 +159,20 @@ def edit_file(file_path, old_str, new_str)
 end
 
 def execute_tool(name, input)
-  case name
+  # Convert input to hash with string keys for consistent access
+  input_hash = input.is_a?(Hash) ? input.transform_keys(&:to_s) : input.to_h.transform_keys(&:to_s)
+
+  case name.to_s
   when "read_file"
     begin
-      content = File.read(input["path"])
+      content = File.read(input_hash["path"])
       { result: content, is_error: false }
     rescue StandardError => e
       { result: e.message, is_error: true }
     end
   when "list_files"
     begin
-      dir = input["path"] || "."
+      dir = input_hash["path"] || "."
       files = walk_directory(dir)
       { result: files.to_json, is_error: false }
     rescue StandardError => e
@@ -177,7 +180,7 @@ def execute_tool(name, input)
     end
   when "edit_file"
     begin
-      result = edit_file(input["path"], input["old_str"], input["new_str"])
+      result = edit_file(input_hash["path"], input_hash["old_str"], input_hash["new_str"])
       { result: result, is_error: false }
     rescue StandardError => e
       { result: e.message, is_error: true }

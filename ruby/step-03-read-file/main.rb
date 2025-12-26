@@ -84,10 +84,13 @@ TOOLS = [
 #
 # Returns: { result: string, is_error: boolean }
 def execute_tool(name, input)
-  case name
+  # Convert input to hash with string keys for consistent access
+  input_hash = input.is_a?(Hash) ? input.transform_keys(&:to_s) : input.to_h.transform_keys(&:to_s)
+
+  case name.to_s
   when "read_file"
     begin
-      content = File.read(input["path"])
+      content = File.read(input_hash["path"])
       { result: content, is_error: false }
     rescue StandardError => e
       { result: e.message, is_error: true }
