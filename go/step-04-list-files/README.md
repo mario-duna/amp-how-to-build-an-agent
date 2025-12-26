@@ -10,13 +10,43 @@ Add a second tool so Claude can explore the filesystem.
 
 ## Available Tools
 
-![Tools](https://mermaid.ink/img/Zmxvd2NoYXJ0IExSCiAgICBDbGF1ZGUgLS0-fGNob29zZXwgQVtyZWFkX2ZpbGVdCiAgICBDbGF1ZGUgLS0-fGNob29zZXwgQltsaXN0X2ZpbGVzXQogICAgQSAtLT4gRlNbKEZpbGUgU3lzdGVtKV0KICAgIEIgLS0-IEZT)
+```mermaid
+flowchart LR
+    Claude --> |choose| Tools
+
+    subgraph Tools
+        A[read_file<br/>Read file contents]
+        B[list_files<br/>List directory]
+    end
+
+    A --> FS[(File System)]
+    B --> FS
+```
 
 ## How Claude Uses Multiple Tools
 
 Claude can chain tools together to accomplish complex tasks:
 
-![Tool Chaining](https://mermaid.ink/img/c2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBVc2VyCiAgICBwYXJ0aWNpcGFudCBDbGF1ZGUKICAgIHBhcnRpY2lwYW50IGxpc3RfZmlsZXMKICAgIHBhcnRpY2lwYW50IHJlYWRfZmlsZQogICAgVXNlci0-PkNsYXVkZTogU3VtbWFyaXplIGFsbCBHbyBmaWxlcwogICAgQ2xhdWRlLT4-bGlzdF9maWxlczogbGlzdF9maWxlcyAuCiAgICBsaXN0X2ZpbGVzLS0-PkNsYXVkZTogbWFpbi5nbywgZ28ubW9kLCAuLi4KICAgIENsYXVkZS0-PnJlYWRfZmlsZTogcmVhZF9maWxlIG1haW4uZ28KICAgIHJlYWRfZmlsZS0tPj5DbGF1ZGU6IGNvbnRlbnRzIG9mIG1haW4uZ28KICAgIENsYXVkZS0-PnJlYWRfZmlsZTogcmVhZF9maWxlIGdvLm1vZAogICAgcmVhZF9maWxlLS0-PkNsYXVkZTogY29udGVudHMgb2YgZ28ubW9kCiAgICBDbGF1ZGUtPj5Vc2VyOiBIZXJlIGlzIGEgc3VtbWFyeS4uLg)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Claude
+    participant list_files
+    participant read_file
+
+    User->>Claude: "Summarize all Go files"
+
+    Claude->>list_files: list_files(".")
+    list_files-->>Claude: ["main.go", "go.mod", ...]
+
+    Claude->>read_file: read_file("main.go")
+    read_file-->>Claude: contents of main.go
+
+    Claude->>read_file: read_file("go.mod")
+    read_file-->>Claude: contents of go.mod
+
+    Claude->>User: "Here's a summary..."
+```
 
 ## Code Change
 

@@ -10,13 +10,41 @@ Build an interactive chat that maintains conversation history.
 
 ## How It Works
 
-![Agent Loop](https://mermaid.ink/img/Zmxvd2NoYXJ0IFRECiAgICBTdGFydChbU3RhcnRdKSAtLT4gTG9vcAogICAgc3ViZ3JhcGggTG9vcFtBZ2VudCBMb29wXQogICAgICAgIEFbR2V0IHVzZXIgaW5wdXRdIC0tPiBCW0FkZCB0byBjb252ZXJzYXRpb24gaGlzdG9yeV0KICAgICAgICBCIC0tPiBDW0NhbGwgQ2xhdWRlIEFQSV0KICAgICAgICBDIC0tPiBEW0FkZCByZXNwb25zZSB0byBoaXN0b3J5XQogICAgICAgIEQgLS0-IEVbRGlzcGxheSByZXNwb25zZV0KICAgICAgICBFIC0tPiBBCiAgICBlbmQKICAgIExvb3AgLS0-IHxDdHJsK0N8IEVuZChbRW5kXSk)
+```mermaid
+flowchart TD
+    Start([Start]) --> Loop
+
+    subgraph Loop [Agent Loop]
+        A[Get user input] --> B[Add to conversation history]
+        B --> C[Call Claude API]
+        C --> D[Add response to history]
+        D --> E[Display response]
+        E --> A
+    end
+
+    Loop --> |Ctrl+C| End([End])
+```
 
 ## Conversation History
 
 The key insight: Claude is stateless. To maintain context, we send the **entire conversation** with each request.
 
-![Conversation History](https://mermaid.ink/img/c2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBVc2VyCiAgICBwYXJ0aWNpcGFudCBBZ2VudAogICAgcGFydGljaXBhbnQgQ2xhdWRlCiAgICBVc2VyLT4-QWdlbnQ6IEhpIEkgYW0gQWxpY2UKICAgIEFnZW50LT4-Q2xhdWRlOiBbdXNlcjogSGkgSSBhbSBBbGljZV0KICAgIENsYXVkZS0tPj5BZ2VudDogSGVsbG8gQWxpY2UhCiAgICBVc2VyLT4-QWdlbnQ6IFdoYXRzIG15IG5hbWU_CiAgICBBZ2VudC0-PkNsYXVkZTogW3VzZXI6IEhpIEkgYW0gQWxpY2UsIGFzc2lzdGFudDogSGVsbG8gQWxpY2UhLCB1c2VyOiBXaGF0cyBteSBuYW1lP10KICAgIENsYXVkZS0tPj5BZ2VudDogWW91ciBuYW1lIGlzIEFsaWNlCiAgICBOb3RlIG92ZXIgQWdlbnQ6IEhpc3RvcnkgZ3Jvd3Mgd2l0aCBlYWNoIHR1cm4)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Agent
+    participant Claude
+
+    User->>Agent: "Hi, I'm Alice"
+    Agent->>Claude: [user: "Hi, I'm Alice"]
+    Claude-->>Agent: "Hello Alice!"
+
+    User->>Agent: "What's my name?"
+    Agent->>Claude: [user: "Hi, I'm Alice", assistant: "Hello Alice!", user: "What's my name?"]
+    Claude-->>Agent: "Your name is Alice"
+
+    Note over Agent: History grows with each turn
+```
 
 ## Run It
 
