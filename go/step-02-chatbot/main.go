@@ -7,6 +7,22 @@
 // - The agent loop: read input -> call LLM -> display output -> repeat
 // - Conversation history: appending messages to maintain context
 // - Separating concerns: Agent struct encapsulates the chat logic
+//
+// =============================================================================
+// MESSAGE TYPES IN THE ANTHROPIC API
+// =============================================================================
+//
+// The API uses a conversation model with two roles:
+//
+//   ROLE: "user"      - Messages from the human (or tool results, as we'll see in step 3)
+//   ROLE: "assistant" - Messages from Claude
+//
+// Each message contains CONTENT BLOCKS. In this step, we only see:
+//
+//   TYPE: "text"      - Plain text content (user input or Claude's response)
+//
+// The conversation array alternates: user, assistant, user, assistant...
+// Claude is STATELESS - we must send the full conversation history each time.
 
 package main
 
@@ -59,6 +75,12 @@ type Agent struct {
 func (a *Agent) Run(ctx context.Context) error {
 	// Conversation history - this is what gives Claude "memory" of the chat.
 	// Each message (user and assistant) gets appended here.
+	//
+	// Example conversation array after a few turns:
+	//   [0] {Role: "user",      Content: [{Type: "text", Text: "Hi!"}]}
+	//   [1] {Role: "assistant", Content: [{Type: "text", Text: "Hello!"}]}
+	//   [2] {Role: "user",      Content: [{Type: "text", Text: "How are you?"}]}
+	//   [3] {Role: "assistant", Content: [{Type: "text", Text: "I'm doing well!"}]}
 	conversation := []anthropic.MessageParam{}
 
 	fmt.Println("Chat with Claude (use 'ctrl-c' to quit)")
@@ -79,6 +101,7 @@ func (a *Agent) Run(ctx context.Context) error {
 		}
 
 		// Step 2: Add user message to conversation history
+		// Creates: {Role: "user", Content: [{Type: "text", Text: userInput}]}
 		userMessage := anthropic.NewUserMessage(anthropic.NewTextBlock(userInput))
 		conversation = append(conversation, userMessage)
 
@@ -90,6 +113,7 @@ func (a *Agent) Run(ctx context.Context) error {
 
 		// Step 4: Add Claude's response to conversation history
 		// This is crucial - Claude needs to see its own previous responses
+		// Creates: {Role: "assistant", Content: [{Type: "text", Text: "..."}]}
 		conversation = append(conversation, message.ToParam())
 
 		// Step 5: Display the response

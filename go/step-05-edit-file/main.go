@@ -14,6 +14,24 @@
 // - Understand files (read_file)
 // - Make changes (edit_file)
 // - And iterate based on results!
+//
+// =============================================================================
+// MESSAGE FLOW SUMMARY
+// =============================================================================
+//
+// Here's how messages flow in a complete agent interaction:
+//
+//   1. USER sends:      {Role: "user", Content: [{Type: "text", Text: "Fix the bug"}]}
+//   2. CLAUDE responds: {Role: "assistant", Content: [{Type: "tool_use", Name: "list_files", ...}]}
+//   3. AGENT sends:     {Role: "user", Content: [{Type: "tool_result", Content: "[file1, file2]"}]}
+//   4. CLAUDE responds: {Role: "assistant", Content: [{Type: "tool_use", Name: "read_file", ...}]}
+//   5. AGENT sends:     {Role: "user", Content: [{Type: "tool_result", Content: "...code..."}]}
+//   6. CLAUDE responds: {Role: "assistant", Content: [{Type: "tool_use", Name: "edit_file", ...}]}
+//   7. AGENT sends:     {Role: "user", Content: [{Type: "tool_result", Content: "OK"}]}
+//   8. CLAUDE responds: {Role: "assistant", Content: [{Type: "text", Text: "I fixed the bug!"}]}
+//
+// Notice: Claude can make MULTIPLE tool calls before giving a final text response.
+// The agent loop keeps running until Claude responds with just text (no tool_use).
 
 package main
 

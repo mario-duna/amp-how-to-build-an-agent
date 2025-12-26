@@ -12,6 +12,32 @@
 // What makes this an "agent"?
 // An agent is an LLM that can take actions in the world. By giving Claude
 // the read_file tool, it can now access information outside its context window.
+//
+// =============================================================================
+// MESSAGE TYPES - NOW WITH TOOLS!
+// =============================================================================
+//
+// Messages still have two roles, but now have MORE CONTENT BLOCK TYPES:
+//
+//   ROLE: "user"      - Human messages OR tool results (yes, tool results!)
+//   ROLE: "assistant" - Claude's responses (may include tool requests)
+//
+// Content block types:
+//
+//   TYPE: "text"        - Plain text (input or response)
+//   TYPE: "tool_use"    - Claude requesting to use a tool (assistant only)
+//                         Contains: id, name, input (the tool's parameters)
+//   TYPE: "tool_result" - Result of executing a tool (sent in user message!)
+//                         Contains: tool_use_id, content, is_error
+//
+// Example conversation with tool use:
+//
+//   [0] {Role: "user",      Content: [{Type: "text", Text: "Read config.json"}]}
+//   [1] {Role: "assistant", Content: [{Type: "tool_use", ID: "xyz", Name: "read_file", Input: {"path": "config.json"}}]}
+//   [2] {Role: "user",      Content: [{Type: "tool_result", ToolUseID: "xyz", Content: "{...file contents...}"}]}
+//   [3] {Role: "assistant", Content: [{Type: "text", Text: "The config file contains..."}]}
+//
+// KEY INSIGHT: Tool results are sent as "user" messages! This is the API convention.
 
 package main
 
@@ -92,38 +118,51 @@ func (a *Agent) Run(ctx context.Context) error {
 		}
 		conversation = append(conversation, message.ToParam())
 
-		// NEW: Process Claude's response, which may contain tool calls.
-		// Claude can respond with text, tool_use, or both!
+		// Process Claude's response content blocks.
+		// An assistant message can contain MULTIPLE content blocks of different types!
+		// For example: [{Type: "text", ...}, {Type: "tool_use", ...}]
 		toolResults := []anthropic.ContentBlockParamUnion{}
 		for _, content := range message.Content {
 			switch content.Type {
 			case "text":
-				// Regular text response - display it
+				// Content block type: "text" - regular text response
 				fmt.Printf("\u001b[93mClaude\u001b[0m: %s\n", content.Text)
 			case "tool_use":
-				// NEW: Claude wants to use a tool!
-				// Execute the tool and collect the result
+				// Content block type: "tool_use" - Claude wants to call a tool!
+				// Contains: content.ID (unique ID), content.Name, content.Input (JSON)
+				// We execute the tool and create a "tool_result" block
 				result := a.executeTool(content.ID, content.Name, content.Input)
 				toolResults = append(toolResults, result)
 			}
 		}
 
-		// NEW: If there were tool calls, send results back to Claude.
-		// Don't wait for user input - let Claude process the results.
+		// If there were tool calls, send results back to Claude.
+		// Don't wait for user input - let Claude process the results first.
 		if len(toolResults) == 0 {
 			readUserInput = true
 			continue
 		}
 		readUserInput = false
-		// Tool results are sent as a "user" message (this is the API convention)
+
+		// IMPORTANT: Tool results are sent as a "user" message!
+		// This creates: {Role: "user", Content: [{Type: "tool_result", ToolUseID: "...", Content: "..."}]}
+		// Why "user"? The API treats tool results as if the user is providing them.
+		// The ToolUseID links each result back to Claude's original tool_use request.
 		conversation = append(conversation, anthropic.NewUserMessage(toolResults...))
 	}
 
 	return nil
 }
 
-// executeTool finds and runs the requested tool, returning the result.
+// executeTool finds and runs the requested tool, returning a tool_result content block.
 // This is the bridge between Claude's request and actual code execution.
+//
+// Parameters come from the tool_use content block:
+//   - id: unique identifier for this tool call (must be included in the result)
+//   - name: which tool to execute
+//   - input: JSON parameters for the tool
+//
+// Returns a tool_result content block: {Type: "tool_result", ToolUseID: id, Content: "..."}
 func (a *Agent) executeTool(id, name string, input json.RawMessage) anthropic.ContentBlockParamUnion {
 	// Find the tool by name
 	var toolDef ToolDefinition
