@@ -2,4 +2,4 @@
 
 source "https://rubygems.org"
 
-gem "anthropic-sdk-beta", "~> 0.1"
+gem "anthropic-sdk-beta", ">= 0.1.0.pre.beta.8"
