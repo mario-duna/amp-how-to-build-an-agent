@@ -1,6 +1,7 @@
 [tools]
 go = "1.23"
 bun = "latest"
+ruby = "3.3"
 
 [env]
 # Set ANTHROPIC_API_KEY in your environment or in .env file
@@ -133,4 +134,47 @@ raw = true
 description = "Run step-05: Complete agent with all tools"
 run = "cd js/step-05-edit-file && bun run index.js"
 depends = ["check-env", "js:deps"]
+raw = true
+
+# =============================================================================
+# Ruby tasks
+# =============================================================================
+
+[tasks."ruby:deps"]
+description = "Install Ruby dependencies"
+run = "cd ruby && bundle install"
+
+[tasks."ruby:run"]
+description = "Run the complete Ruby agent (step-05)"
+run = "cd ruby/step-05-edit-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-01"]
+description = "Run step-01: Hello Claude (single API call)"
+run = "cd ruby/step-01-hello-claude && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+
+[tasks."ruby:step-02"]
+description = "Run step-02: Interactive chatbot"
+run = "cd ruby/step-02-chatbot && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-03"]
+description = "Run step-03: Agent with read_file tool"
+run = "cd ruby/step-03-read-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-04"]
+description = "Run step-04: Agent with read_file + list_files tools"
+run = "cd ruby/step-04-list-files && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-05"]
+description = "Run step-05: Complete agent with all tools"
+run = "cd ruby/step-05-edit-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
 raw = true
