@@ -1,0 +1,8 @@
+# Environment file with API key
+env.sh
+
+# Go build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
