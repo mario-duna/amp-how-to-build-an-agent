@@ -45,5 +45,9 @@ func main() {
 
 	// Print Claude's response.
 	// message.Content is an array of content blocks (usually just one text block)
-	fmt.Printf("%+v\n", message.Content)
+	for _, block := range message.Content {
+		if block.Type == "text" {
+			fmt.Println(block.Text)
+		}
+	}
 }
