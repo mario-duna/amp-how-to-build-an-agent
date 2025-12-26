@@ -117,6 +117,7 @@ class Agent
   end
 
   def run
+    $stdout.sync = true
     puts "Chat with Claude (use 'ctrl-c' to quit)"
 
     # NEW: read_user_input flag controls whether we wait for user input.
@@ -144,7 +145,7 @@ class Agent
       tool_results = []
 
       message.content.each do |block|
-        case block.type
+        case block.type.to_s
         when "text"
           # Content block type: "text" - regular text response
           puts "\e[93mClaude\e[0m: #{block.text}"

@@ -56,6 +56,7 @@ class Agent
   # run starts the main conversation loop.
   # This is the heart of any agent: a loop that processes input and generates responses.
   def run
+    $stdout.sync = true
     puts "Chat with Claude (use 'ctrl-c' to quit)"
 
     # THE AGENT LOOP: This pattern is fundamental to all agents.
@@ -85,7 +86,7 @@ class Agent
 
       # Step 5: Display the response
       message.content.each do |block|
-        puts "\e[93mClaude\e[0m: #{block.text}" if block.type == "text"
+        puts "\e[93mClaude\e[0m: #{block.text}" if block.type.to_s == "text"
       end
       # Step 6: Loop continues...
     end
