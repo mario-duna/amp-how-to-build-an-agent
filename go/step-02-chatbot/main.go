@@ -108,7 +108,7 @@ func (a *Agent) Run(ctx context.Context) error {
 // runInference sends the conversation to Claude and returns the response.
 func (a *Agent) runInference(ctx context.Context, conversation []anthropic.MessageParam) (*anthropic.Message, error) {
 	message, err := a.client.Messages.New(ctx, anthropic.MessageNewParams{
-		Model:     anthropic.ModelClaude3_7SonnetLatest,
+		Model:     "claude-opus-4-5-20251101",
 		MaxTokens: int64(1024),
 		// Pass the entire conversation history - this is how Claude maintains context
 		Messages: conversation,

@@ -37,7 +37,7 @@ func main() {
 		}},
 
 		// Model specifies which Claude model to use
-		Model: anthropic.ModelClaude3_7SonnetLatest,
+		Model: "claude-opus-4-5-20251101",
 	})
 	if err != nil {
 		panic(err.Error())
