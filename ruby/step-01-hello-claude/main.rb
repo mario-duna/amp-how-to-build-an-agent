@@ -36,6 +36,10 @@ message = client.messages.create(
 
 # Print Claude's response.
 # message.content is an array of content blocks (usually just one text block)
+$stdout.sync = true
 message.content.each do |block|
-  puts block.text if block.type == "text"
+  # The SDK may return type as string or symbol depending on version
+  if block.type.to_s == "text"
+    puts block.text
+  end
 end

@@ -68,6 +68,7 @@ raw = true
 description = "Run step-01: Hello Claude (single API call)"
 run = "cd go/step-01-hello-claude && go run main.go"
 depends = ["check-env", "go:deps"]
+raw = true
 
 [tasks."go:step-02"]
 description = "Run step-02: Interactive chatbot"
@@ -111,6 +112,7 @@ raw = true
 description = "Run step-01: Hello Claude (single API call)"
 run = "cd js/step-01-hello-claude && bun run index.js"
 depends = ["check-env", "js:deps"]
+raw = true
 
 [tasks."js:step-02"]
 description = "Run step-02: Interactive chatbot"
@@ -154,6 +156,7 @@ raw = true
 description = "Run step-01: Hello Claude (single API call)"
 run = "cd ruby/step-01-hello-claude && bundle exec ruby main.rb"
 depends = ["check-env", "ruby:deps"]
+raw = true
 
 [tasks."ruby:step-02"]
 description = "Run step-02: Interactive chatbot"
