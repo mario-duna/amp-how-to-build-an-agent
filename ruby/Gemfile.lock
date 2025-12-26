@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    anthropic-sdk-beta (0.1.0.pre.beta.8)
+      connection_pool
+    connection_pool (3.0.2)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  anthropic-sdk-beta (>= 0.1.0.pre.beta.8)
+
+BUNDLED WITH
+   2.5.22

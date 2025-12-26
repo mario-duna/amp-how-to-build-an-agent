@@ -1,0 +1,16 @@
+# Environment files with secrets
+.env
+env.sh
+
+# Go
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Node (for future JS implementation)
+node_modules/
+
+# Ruby (for future Ruby implementation)
+.bundle/
+vendor/bundle/

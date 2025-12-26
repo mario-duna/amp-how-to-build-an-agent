@@ -1,0 +1,183 @@
+[tools]
+go = "1.23"
+bun = "latest"
+ruby = "3.3"
+
+[env]
+# Set ANTHROPIC_API_KEY in your environment or in .env file
+_.file = ".env"
+
+# =============================================================================
+# Setup tasks
+# =============================================================================
+
+[tasks.setup]
+description = "Create .env file from template if it doesn't exist"
+run = """
+if [ ! -f .env ]; then
+  cp .env.example .env
+  echo "Created .env file from .env.example"
+  echo "Please edit .env and add your ANTHROPIC_API_KEY"
+else
+  echo ".env file already exists"
+fi
+"""
+
+[tasks."check-env"]
+description = "Verify ANTHROPIC_API_KEY is configured"
+run = """
+if [ ! -f .env ]; then
+  echo "Error: .env file not found"
+  echo "Run 'mise run setup' to create it from .env.example"
+  exit 1
+fi
+
+if ! grep -q "ANTHROPIC_API_KEY=" .env; then
+  echo "Error: ANTHROPIC_API_KEY not found in .env"
+  exit 1
+fi
+
+if grep -q "ANTHROPIC_API_KEY=your-api-key-here" .env; then
+  echo "Error: ANTHROPIC_API_KEY is still set to placeholder value"
+  echo "Please edit .env and add your actual API key"
+  exit 1
+fi
+
+if grep -q "ANTHROPIC_API_KEY=$" .env || grep -q 'ANTHROPIC_API_KEY=""' .env; then
+  echo "Error: ANTHROPIC_API_KEY is empty"
+  echo "Please edit .env and add your actual API key"
+  exit 1
+fi
+"""
+
+# =============================================================================
+# Go tasks
+# =============================================================================
+
+[tasks."go:deps"]
+description = "Install Go dependencies"
+run = "cd go && go mod tidy"
+
+[tasks."go:run"]
+description = "Run the complete Go agent (step-05)"
+run = "cd go/step-05-edit-file && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+[tasks."go:step-01"]
+description = "Run step-01: Hello Claude (single API call)"
+run = "cd go/step-01-hello-claude && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+[tasks."go:step-02"]
+description = "Run step-02: Interactive chatbot"
+run = "cd go/step-02-chatbot && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+[tasks."go:step-03"]
+description = "Run step-03: Agent with read_file tool"
+run = "cd go/step-03-read-file && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+[tasks."go:step-04"]
+description = "Run step-04: Agent with read_file + list_files tools"
+run = "cd go/step-04-list-files && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+[tasks."go:step-05"]
+description = "Run step-05: Complete agent with all tools"
+run = "cd go/step-05-edit-file && go run main.go"
+depends = ["check-env", "go:deps"]
+raw = true
+
+# =============================================================================
+# JavaScript (Bun) tasks
+# =============================================================================
+
+[tasks."js:deps"]
+description = "Install JavaScript dependencies"
+run = "cd js && bun install"
+
+[tasks."js:run"]
+description = "Run the complete JS agent (step-05)"
+run = "cd js/step-05-edit-file && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-01"]
+description = "Run step-01: Hello Claude (single API call)"
+run = "cd js/step-01-hello-claude && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-02"]
+description = "Run step-02: Interactive chatbot"
+run = "cd js/step-02-chatbot && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-03"]
+description = "Run step-03: Agent with read_file tool"
+run = "cd js/step-03-read-file && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-04"]
+description = "Run step-04: Agent with read_file + list_files tools"
+run = "cd js/step-04-list-files && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+[tasks."js:step-05"]
+description = "Run step-05: Complete agent with all tools"
+run = "cd js/step-05-edit-file && bun run index.js"
+depends = ["check-env", "js:deps"]
+raw = true
+
+# =============================================================================
+# Ruby tasks
+# =============================================================================
+
+[tasks."ruby:deps"]
+description = "Install Ruby dependencies"
+run = "cd ruby && bundle install"
+
+[tasks."ruby:run"]
+description = "Run the complete Ruby agent (step-05)"
+run = "cd ruby/step-05-edit-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-01"]
+description = "Run step-01: Hello Claude (single API call)"
+run = "cd ruby/step-01-hello-claude && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-02"]
+description = "Run step-02: Interactive chatbot"
+run = "cd ruby/step-02-chatbot && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-03"]
+description = "Run step-03: Agent with read_file tool"
+run = "cd ruby/step-03-read-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-04"]
+description = "Run step-04: Agent with read_file + list_files tools"
+run = "cd ruby/step-04-list-files && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
+
+[tasks."ruby:step-05"]
+description = "Run step-05: Complete agent with all tools"
+run = "cd ruby/step-05-edit-file && bundle exec ruby main.rb"
+depends = ["check-env", "ruby:deps"]
+raw = true
