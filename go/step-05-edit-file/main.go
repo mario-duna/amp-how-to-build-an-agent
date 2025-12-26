@@ -1,3 +1,20 @@
+// Step 5: The Complete Agent - Adding edit_file
+//
+// MILESTONE: Give Claude the ability to CREATE and MODIFY files.
+// This is the final piece - your agent can now change the world!
+//
+// Key concepts:
+// - With read + list + edit, Claude can understand AND modify codebases
+// - The edit_file tool uses search/replace for precise edits
+// - Creating new files: old_str="" means "create this file with new_str"
+// - This is a fully functional coding agent in ~300 lines of code!
+//
+// You now have an agent that can:
+// - Explore a codebase (list_files)
+// - Understand files (read_file)
+// - Make changes (edit_file)
+// - And iterate based on results!
+
 package main
 
 import (
@@ -25,6 +42,7 @@ func main() {
 		return scanner.Text(), true
 	}
 
+	// The complete toolkit: read, list, and edit files
 	tools := []ToolDefinition{ReadFileDefinition, ListFilesDefinition, EditFileDefinition}
 	agent := NewAgent(&client, getUserMessage, tools)
 	err := agent.Run(context.TODO())
@@ -51,6 +69,8 @@ type Agent struct {
 	tools          []ToolDefinition
 }
 
+// Run is the main agent loop - unchanged from step 3.
+// The same loop handles any number of tools!
 func (a *Agent) Run(ctx context.Context) error {
 	conversation := []anthropic.MessageParam{}
 
@@ -139,12 +159,34 @@ func (a *Agent) runInference(ctx context.Context, conversation []anthropic.Messa
 	return message, err
 }
 
+// =============================================================================
+// TOOL INFRASTRUCTURE
+// =============================================================================
+
 type ToolDefinition struct {
 	Name        string                         `json:"name"`
 	Description string                         `json:"description"`
 	InputSchema anthropic.ToolInputSchemaParam `json:"input_schema"`
 	Function    func(input json.RawMessage) (string, error)
 }
+
+func GenerateSchema[T any]() anthropic.ToolInputSchemaParam {
+	reflector := jsonschema.Reflector{
+		AllowAdditionalProperties: false,
+		DoNotReference:            true,
+	}
+	var v T
+
+	schema := reflector.Reflect(v)
+
+	return anthropic.ToolInputSchemaParam{
+		Properties: schema.Properties,
+	}
+}
+
+// =============================================================================
+// TOOL: read_file
+// =============================================================================
 
 var ReadFileDefinition = ToolDefinition{
 	Name:        "read_file",
@@ -173,19 +215,9 @@ func ReadFile(input json.RawMessage) (string, error) {
 	return string(content), nil
 }
 
-func GenerateSchema[T any]() anthropic.ToolInputSchemaParam {
-	reflector := jsonschema.Reflector{
-		AllowAdditionalProperties: false,
-		DoNotReference:            true,
-	}
-	var v T
-
-	schema := reflector.Reflect(v)
-
-	return anthropic.ToolInputSchemaParam{
-		Properties: schema.Properties,
-	}
-}
+// =============================================================================
+// TOOL: list_files
+// =============================================================================
 
 var ListFilesDefinition = ToolDefinition{
 	Name:        "list_files",
@@ -245,6 +277,17 @@ func ListFiles(input json.RawMessage) (string, error) {
 	return string(result), nil
 }
 
+// =============================================================================
+// TOOL: edit_file (NEW in this step - the key to a coding agent!)
+// =============================================================================
+
+// EditFileDefinition defines the edit_file tool.
+// This is what makes Claude a CODING agent - it can modify files!
+//
+// The search/replace approach (old_str -> new_str) is simple but powerful:
+// - Precise: only changes exactly what's specified
+// - Verifiable: Claude must know what's there to replace it
+// - Create files: old_str="" means create new file with new_str content
 var EditFileDefinition = ToolDefinition{
 	Name: "edit_file",
 	Description: `Make edits to a text file.
@@ -265,6 +308,8 @@ type EditFileInput struct {
 
 var EditFileInputSchema = GenerateSchema[EditFileInput]()
 
+// EditFile implements search/replace editing.
+// This is a simple but effective approach used by many coding agents.
 func EditFile(input json.RawMessage) (string, error) {
 	editFileInput := EditFileInput{}
 	err := json.Unmarshal(input, &editFileInput)
@@ -272,25 +317,31 @@ func EditFile(input json.RawMessage) (string, error) {
 		return "", err
 	}
 
+	// Validate inputs
 	if editFileInput.Path == "" || editFileInput.OldStr == editFileInput.NewStr {
 		return "", fmt.Errorf("invalid input parameters")
 	}
 
+	// Try to read existing file
 	content, err := os.ReadFile(editFileInput.Path)
 	if err != nil {
+		// File doesn't exist - create it if old_str is empty (create mode)
 		if os.IsNotExist(err) && editFileInput.OldStr == "" {
 			return createNewFile(editFileInput.Path, editFileInput.NewStr)
 		}
 		return "", err
 	}
 
+	// Perform the replacement
 	oldContent := string(content)
 	newContent := strings.Replace(oldContent, editFileInput.OldStr, editFileInput.NewStr, -1)
 
+	// Verify the replacement happened
 	if oldContent == newContent && editFileInput.OldStr != "" {
 		return "", fmt.Errorf("old_str not found in file")
 	}
 
+	// Write the modified content
 	err = os.WriteFile(editFileInput.Path, []byte(newContent), 0644)
 	if err != nil {
 		return "", err
@@ -299,7 +350,10 @@ func EditFile(input json.RawMessage) (string, error) {
 	return "OK", nil
 }
 
+// createNewFile creates a new file with the given content.
+// Creates parent directories if needed.
 func createNewFile(filePath, content string) (string, error) {
+	// Create parent directories if they don't exist
 	dir := path.Dir(filePath)
 	if dir != "." {
 		err := os.MkdirAll(dir, 0755)
@@ -308,6 +362,7 @@ func createNewFile(filePath, content string) (string, error) {
 		}
 	}
 
+	// Write the file
 	err := os.WriteFile(filePath, []byte(content), 0644)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)

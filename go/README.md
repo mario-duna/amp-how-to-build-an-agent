@@ -33,9 +33,10 @@ If not using mise:
 
 | Step | Description | Tools |
 |------|-------------|-------|
-| 00 | Hello World | - |
-| 01 | Single API call to Claude | - |
-| 02 | Interactive chatbot | - |
-| 03 | Tool use basics | `read_file` |
-| 04 | Multiple tools | `read_file`, `list_files` |
-| 05 | Complete agent | `read_file`, `list_files`, `edit_file` |
+| 01 | First API call to Claude | - |
+| 02 | Interactive chatbot with conversation history | - |
+| 03 | Adding tools - Claude can read files | `read_file` |
+| 04 | Multiple tools - Claude can explore directories | `read_file`, `list_files` |
+| 05 | Complete agent - Claude can edit files | `read_file`, `list_files`, `edit_file` |
+
+Each step's code is heavily commented explaining the key concepts and what each block does.

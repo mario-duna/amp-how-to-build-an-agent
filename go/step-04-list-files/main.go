@@ -1,3 +1,15 @@
+// Step 4: Multiple Tools - Adding list_files
+//
+// MILESTONE: Give Claude a second tool to explore the filesystem.
+// This shows how easy it is to add more capabilities to your agent.
+//
+// Key concepts:
+// - Adding tools is just adding to the tools slice
+// - Each tool follows the same pattern: definition struct + implementation
+// - Claude can now explore directories to find files, then read them
+//
+// With read_file + list_files, Claude can navigate and understand codebases!
+
 package main
 
 import (
@@ -23,6 +35,7 @@ func main() {
 		return scanner.Text(), true
 	}
 
+	// NEW: Two tools! Adding capabilities is as simple as adding to this slice.
 	tools := []ToolDefinition{ReadFileDefinition, ListFilesDefinition}
 	agent := NewAgent(&client, getUserMessage, tools)
 	err := agent.Run(context.TODO())
@@ -137,12 +150,34 @@ func (a *Agent) runInference(ctx context.Context, conversation []anthropic.Messa
 	return message, err
 }
 
+// =============================================================================
+// TOOL INFRASTRUCTURE
+// =============================================================================
+
 type ToolDefinition struct {
 	Name        string                         `json:"name"`
 	Description string                         `json:"description"`
 	InputSchema anthropic.ToolInputSchemaParam `json:"input_schema"`
 	Function    func(input json.RawMessage) (string, error)
 }
+
+func GenerateSchema[T any]() anthropic.ToolInputSchemaParam {
+	reflector := jsonschema.Reflector{
+		AllowAdditionalProperties: false,
+		DoNotReference:            true,
+	}
+	var v T
+
+	schema := reflector.Reflect(v)
+
+	return anthropic.ToolInputSchemaParam{
+		Properties: schema.Properties,
+	}
+}
+
+// =============================================================================
+// TOOL: read_file (same as step 3)
+// =============================================================================
 
 var ReadFileDefinition = ToolDefinition{
 	Name:        "read_file",
@@ -171,20 +206,12 @@ func ReadFile(input json.RawMessage) (string, error) {
 	return string(content), nil
 }
 
-func GenerateSchema[T any]() anthropic.ToolInputSchemaParam {
-	reflector := jsonschema.Reflector{
-		AllowAdditionalProperties: false,
-		DoNotReference:            true,
-	}
-	var v T
+// =============================================================================
+// TOOL: list_files (NEW in this step)
+// =============================================================================
 
-	schema := reflector.Reflect(v)
-
-	return anthropic.ToolInputSchemaParam{
-		Properties: schema.Properties,
-	}
-}
-
+// ListFilesDefinition defines the list_files tool.
+// This complements read_file - Claude can explore to find files, then read them.
 var ListFilesDefinition = ToolDefinition{
 	Name:        "list_files",
 	Description: "List files and directories at a given path. If no path is provided, lists files in the current directory.",
@@ -192,12 +219,16 @@ var ListFilesDefinition = ToolDefinition{
 	Function:    ListFiles,
 }
 
+// ListFilesInput - note the omitempty: this parameter is optional.
+// Claude can call list_files() with no arguments to see the current directory.
 type ListFilesInput struct {
 	Path string `json:"path,omitempty" jsonschema_description:"Optional relative path to list files from. Defaults to current directory if not provided."`
 }
 
 var ListFilesInputSchema = GenerateSchema[ListFilesInput]()
 
+// ListFiles recursively walks a directory and returns all files/folders.
+// Returns JSON array of paths - easy for Claude to parse and use.
 func ListFiles(input json.RawMessage) (string, error) {
 	listFilesInput := ListFilesInput{}
 	err := json.Unmarshal(input, &listFilesInput)
@@ -205,11 +236,13 @@ func ListFiles(input json.RawMessage) (string, error) {
 		panic(err)
 	}
 
+	// Default to current directory if no path provided
 	dir := "."
 	if listFilesInput.Path != "" {
 		dir = listFilesInput.Path
 	}
 
+	// Walk the directory tree and collect all paths
 	var files []string
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -222,6 +255,7 @@ func ListFiles(input json.RawMessage) (string, error) {
 		}
 
 		if relPath != "." {
+			// Add trailing slash to directories so Claude knows what's a folder
 			if info.IsDir() {
 				files = append(files, relPath+"/")
 			} else {
@@ -235,6 +269,7 @@ func ListFiles(input json.RawMessage) (string, error) {
 		return "", err
 	}
 
+	// Return as JSON array - structured data is easier for Claude to work with
 	result, err := json.Marshal(files)
 	if err != nil {
 		return "", err

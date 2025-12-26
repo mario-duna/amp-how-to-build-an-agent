@@ -50,7 +50,6 @@ mise tasks
 |------|-------------|
 | `mise run go:deps` | Install Go dependencies |
 | `mise run go:run` | Run the complete agent |
-| `mise run go:step-00` | Hello World |
 | `mise run go:step-01` | Single API call to Claude |
 | `mise run go:step-02` | Interactive chatbot |
 | `mise run go:step-03` | Agent with `read_file` tool |
@@ -63,9 +62,8 @@ Each step builds upon the previous one:
 
 | Step | What You Learn |
 |------|----------------|
-| 00 | Basic project setup |
 | 01 | Making your first API call to Claude |
-| 02 | Building a conversation loop |
+| 02 | Building a conversation loop (the "agentic loop") |
 | 03 | Adding tools - the `read_file` tool |
 | 04 | Multiple tools - adding `list_files` |
 | 05 | Complete agent - adding `edit_file` |
