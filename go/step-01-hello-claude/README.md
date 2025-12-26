@@ -10,34 +10,11 @@ Your first API call to Claude - the foundation of everything.
 
 ## How It Works
 
-```mermaid
-sequenceDiagram
-    participant App
-    participant Claude API
-
-    App->>Claude API: Send message request
-    Note right of App: "What is a quaternion?"
-    Claude API-->>App: Return response
-    Note left of Claude API: Text response
-    App->>App: Print response
-```
+![Sequence Diagram](https://mermaid.ink/img/c2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBBcHAKICAgIHBhcnRpY2lwYW50IENsYXVkZSBBUEkKICAgIEFwcC0-PkNsYXVkZSBBUEk6IFNlbmQgbWVzc2FnZSByZXF1ZXN0CiAgICBOb3RlIHJpZ2h0IG9mIEFwcDogV2hhdCBpcyBhIHF1YXRlcm5pb24_CiAgICBDbGF1ZGUgQVBJLS0-PkFwcDogUmV0dXJuIHJlc3BvbnNlCiAgICBOb3RlIGxlZnQgb2YgQ2xhdWRlIEFQSTogVGV4dCByZXNwb25zZQogICAgQXBwLT4-QXBwOiBQcmludCByZXNwb25zZQ)
 
 ## Key Components
 
-```mermaid
-flowchart LR
-    subgraph Request
-        A[MaxTokens]
-        B[Messages]
-        C[Model]
-    end
-
-    subgraph Response
-        D[Content blocks]
-    end
-
-    Request --> API[Claude API] --> Response
-```
+![Components](https://mermaid.ink/img/Zmxvd2NoYXJ0IExSCiAgICBzdWJncmFwaCBSZXF1ZXN0CiAgICAgICAgQVtNYXhUb2tlbnNdCiAgICAgICAgQltNZXNzYWdlc10KICAgICAgICBDW01vZGVsXQogICAgZW5kCiAgICBzdWJncmFwaCBSZXNwb25zZQogICAgICAgIERbQ29udGVudCBibG9ja3NdCiAgICBlbmQKICAgIFJlcXVlc3QgLS0-IEFQSVtDbGF1ZGUgQVBJXSAtLT4gUmVzcG9uc2U)
 
 ## Run It
 

@@ -10,24 +10,7 @@ The final piece: Claude can now **create and modify files**.
 
 ## The Complete Agent
 
-```mermaid
-flowchart TB
-    User([User]) <--> Agent
-
-    subgraph Agent[Complete Agent]
-        Loop[Agent Loop]
-
-        subgraph Tools
-            RF[read_file<br/>Understand code]
-            LF[list_files<br/>Explore codebase]
-            EF[edit_file<br/>Make changes]
-        end
-
-        Loop <--> Tools
-    end
-
-    Tools <--> FS[(File System)]
-```
+![Complete Agent](https://mermaid.ink/img/Zmxvd2NoYXJ0IFRCCiAgICBVc2VyKFtVc2VyXSkgPC0tPiBBZ2VudAogICAgc3ViZ3JhcGggQWdlbnRbQ29tcGxldGUgQWdlbnRdCiAgICAgICAgTG9vcFtBZ2VudCBMb29wXQogICAgICAgIHN1YmdyYXBoIFRvb2xzCiAgICAgICAgICAgIFJGW3JlYWRfZmlsZV0KICAgICAgICAgICAgTEZbbGlzdF9maWxlc10KICAgICAgICAgICAgRUZbZWRpdF9maWxlXQogICAgICAgIGVuZAogICAgICAgIExvb3AgPC0tPiBUb29scwogICAgZW5kCiAgICBUb29scyA8LS0-IEZTWyhGaWxlIFN5c3RlbSld)
 
 ## Agent Capabilities
 
@@ -41,67 +24,11 @@ flowchart TB
 
 Uses search/replace for precise edits:
 
-```mermaid
-flowchart LR
-    subgraph Input
-        A[path: file.go]
-        B[old_str: text to find]
-        C[new_str: replacement]
-    end
-
-    subgraph Behavior
-        D{old_str empty?}
-        D -->|yes| E[Create new file<br/>with new_str content]
-        D -->|no| F[Replace old_str<br/>with new_str]
-    end
-
-    Input --> Behavior
-```
-
-## Complete Agent Loop
-
-```mermaid
-flowchart TD
-    Start([User Request]) --> A[Add to conversation]
-    A --> B[Call Claude with all tools]
-    B --> C{Response contains?}
-
-    C -->|text| D[Display to user]
-    C -->|tool_use| E{Which tool?}
-
-    E -->|read_file| F[Read and return contents]
-    E -->|list_files| G[List and return files]
-    E -->|edit_file| H[Modify file]
-
-    F --> I[Add result to conversation]
-    G --> I
-    H --> I
-    I --> B
-
-    D --> End([Wait for next request])
-```
+![edit_file](https://mermaid.ink/img/Zmxvd2NoYXJ0IExSCiAgICBzdWJncmFwaCBJbnB1dAogICAgICAgIEFbcGF0aDogZmlsZS5nb10KICAgICAgICBCW29sZF9zdHI6IHRleHQgdG8gZmluZF0KICAgICAgICBDW25ld19zdHI6IHJlcGxhY2VtZW50XQogICAgZW5kCiAgICBzdWJncmFwaCBCZWhhdmlvcgogICAgICAgIER7b2xkX3N0ciBlbXB0eT99CiAgICAgICAgRCAtLT58eWVzfCBFW0NyZWF0ZSBuZXcgZmlsZV0KICAgICAgICBEIC0tPnxub3wgRltSZXBsYWNlIHRleHRdCiAgICBlbmQKICAgIElucHV0IC0tPiBCZWhhdmlvcg)
 
 ## Example: Bug Fix Workflow
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Claude
-    participant Tools
-
-    User->>Claude: "Fix the typo in main.go"
-
-    Claude->>Tools: list_files(".")
-    Tools-->>Claude: [main.go, ...]
-
-    Claude->>Tools: read_file("main.go")
-    Tools-->>Claude: File with typo
-
-    Claude->>Tools: edit_file(path, old="teh", new="the")
-    Tools-->>Claude: OK
-
-    Claude->>User: "Fixed the typo 'teh' → 'the'"
-```
+![Bug Fix](https://mermaid.ink/img/c2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBVc2VyCiAgICBwYXJ0aWNpcGFudCBDbGF1ZGUKICAgIHBhcnRpY2lwYW50IFRvb2xzCiAgICBVc2VyLT4-Q2xhdWRlOiBGaXggdGhlIHR5cG8gaW4gbWFpbi5nbwogICAgQ2xhdWRlLT4-VG9vbHM6IGxpc3RfZmlsZXMgLgogICAgVG9vbHMtLT4-Q2xhdWRlOiBtYWluLmdvLCAuLi4KICAgIENsYXVkZS0-PlRvb2xzOiByZWFkX2ZpbGUgbWFpbi5nbwogICAgVG9vbHMtLT4-Q2xhdWRlOiBGaWxlIHdpdGggdHlwbwogICAgQ2xhdWRlLT4-VG9vbHM6IGVkaXRfZmlsZSBwYXRoIG9sZD10ZWggbmV3PXRoZQogICAgVG9vbHMtLT4-Q2xhdWRlOiBPSwogICAgQ2xhdWRlLT4-VXNlcjogRml4ZWQgdHlwbyB0ZWggdG8gdGhl)
 
 ## Run It
 
